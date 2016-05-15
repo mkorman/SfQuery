@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -51,43 +52,15 @@ namespace SfQuery
 
         public string GetAccounts()
         {
-            var request = CreateQueryRequest("Account");
-            return getResponseText(request);
-        }
-
-        private WebRequest CreateQueryRequest(string sObjectType)
-        {
-            var endpoint = string.Format(QUERY_ENDPOINT, InstanceUrl);
-            Console.WriteLine($"Endpoint: {endpoint}");
-            var request = (HttpWebRequest)WebRequest.Create(endpoint);
-            request.Method = "GET";
-            request.ContentType = "application/json";
-            request.Headers.Add("Authorization", $"Bearer {AuthToken}");
-
-            return request;
-        }
-
-        private string getResponseText(WebRequest request)
-        {
-            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var client = new HttpClient())
             {
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new ApplicationException("Request failed. Received HTTP {response.StatusCode}");
-                }
-
-                using (var responseStream = response.GetResponseStream())
-                {
-                    if (responseStream != null)
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            return reader.ReadToEnd();
-                        }
-                    }
-                }
+                string restQuery = InstanceUrl + "/services/data/v33.0/sobjects/Account";
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, restQuery);
+                request.Headers.Add("Authorization", "Bearer " + AuthToken);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = client.SendAsync(request).Result;
+                return response.Content.ReadAsStringAsync().Result;
             }
-            return null;
         }
     }
 }
