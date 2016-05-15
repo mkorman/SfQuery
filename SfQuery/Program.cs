@@ -9,7 +9,7 @@ namespace SfQuery
 {
     public class Program
     {
-        static void Main(string[] args)
+        private static void start()
         {
             var client = new SalesforceClient
             {
@@ -21,8 +21,13 @@ namespace SfQuery
             };
 
             client.Login();
-            Console.WriteLine(client.GetAccounts());
+            client.GetAccounts();
             Console.ReadLine();
+        }
+
+        static void Main(string[] args)
+        {
+            start();
         }
     }
 }

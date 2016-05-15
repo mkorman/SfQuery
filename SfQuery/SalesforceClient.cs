@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 
@@ -12,7 +14,7 @@ namespace SfQuery
     public class SalesforceClient
     {
         private const string LOGIN_ENDPOINT = "https://login.salesforce.com/services/oauth2/token";
-        private const string QUERY_ENDPOINT = "https://{0}.salesforce.com/services/data/v{1}/sobjects/{2}";
+        private const string QUERY_ENDPOINT = "{0}/services/data/v36.0/";
 
         public string Username { get; set; }
         public string Password { get; set; }
@@ -20,16 +22,31 @@ namespace SfQuery
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string AuthToken { get; set; }
+        public string InstanceUrl { get; set; }
 
+        // TODO: use RestSharps
         public void Login()
         {
-            var request = CreateLoginRequest();
-            var response = getResponseText(request);
-            Console.WriteLine(response);
+            String response;
+            using (var client = new HttpClient())
+            {
+                HttpContent content = new FormUrlEncodedContent(new Dictionary<string, string>
+                    {
+                        {"grant_type", "password"},
+                        {"client_id", ClientId},
+                        {"client_secret", ClientSecret},
+                        {"username", Username},
+                        {"password", Password + Token}
+                    }
+                );
+                HttpResponseMessage message = client.PostAsync(LOGIN_ENDPOINT, content).Result;
+                response = message.Content.ReadAsStringAsync().Result;
+            }
+            Console.WriteLine($"Response: {response}");
             Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
             AuthToken = values["signature"];
-
-            Console.WriteLine($"Token: {AuthToken}");
+            InstanceUrl = values["instance_url"];
+            //Console.WriteLine($"Token: {AuthToken}");
         }
 
         public string GetAccounts()
@@ -38,32 +55,14 @@ namespace SfQuery
             return getResponseText(request);
         }
 
-        // TODO: use RestSharps
-        private HttpWebRequest CreateLoginRequest()
-        {
-            var request = (HttpWebRequest)WebRequest.Create(LOGIN_ENDPOINT);
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-
-            var postData = $"grant_type=password&client_id={ClientId}&client_secret={ClientSecret}&username={Username}&password={Password}{Token}";
-            var bytes = Encoding.GetEncoding("iso-8859-1").GetBytes(postData);
-            request.ContentLength = bytes.Length;
-
-            using (var writeStream = request.GetRequestStream())
-            {
-                writeStream.Write(bytes, 0, bytes.Length);
-            }
-
-            return request;
-        }
-
         private WebRequest CreateQueryRequest(string sObjectType)
         {
-            var endpoint = string.Format(QUERY_ENDPOINT, "emea", "36.0", sObjectType);
+            var endpoint = string.Format(QUERY_ENDPOINT, InstanceUrl);
+            Console.WriteLine($"Endpoint: {endpoint}");
             var request = (HttpWebRequest)WebRequest.Create(endpoint);
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.Headers.Add("Authorisation:",$"Bearer:{AuthToken}");
+            request.Method = "GET";
+            request.ContentType = "application/json";
+            request.Headers.Add("Authorization", $"Bearer {AuthToken}");
 
             return request;
         }
