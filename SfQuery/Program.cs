@@ -21,7 +21,8 @@ namespace SfQuery
             };
 
             client.Login();
-            Console.WriteLine(client.GetAccounts());
+            Console.WriteLine(client.Describe("Account"));
+            Console.WriteLine(client.Describe("Contact"));
             Console.ReadLine();
         }
 

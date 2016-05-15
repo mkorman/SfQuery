@@ -37,7 +37,7 @@ namespace SfQuery
             String response;
             using (var client = new HttpClient())
             {
-                HttpContent content = new FormUrlEncodedContent(new Dictionary<string, string>
+                var content = new FormUrlEncodedContent(new Dictionary<string, string>
                     {
                         {"grant_type", "password"},
                         {"client_id", ClientId},
@@ -46,25 +46,26 @@ namespace SfQuery
                         {"password", Password + Token}
                     }
                 );
-                HttpResponseMessage message = client.PostAsync(LOGIN_ENDPOINT, content).Result;
+                var message = client.PostAsync(LOGIN_ENDPOINT, content).Result;
                 response = message.Content.ReadAsStringAsync().Result;
             }
             Console.WriteLine($"Response: {response}");
-            Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
+            var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
             AuthToken = values["access_token"];
             InstanceUrl = values["instance_url"];
             //Console.WriteLine($"Token: {AuthToken}");
         }
 
-        public string GetAccounts()
+        public string Describe(string sObject)
         {
             using (var client = new HttpClient())
             {
-                string restQuery = InstanceUrl + "/services/data/v33.0/sobjects/Account";
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, restQuery);
+                string restQuery = InstanceUrl + "/services/data/v33.0/sobjects/" + sObject;
+                var request = new HttpRequestMessage(HttpMethod.Get, restQuery);
                 request.Headers.Add("Authorization", "Bearer " + AuthToken);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = client.SendAsync(request).Result;
+                request.Headers.Add("X-PrettyPrint", "1");
+                var response = client.SendAsync(request).Result;
                 return response.Content.ReadAsStringAsync().Result;
             }
         }
