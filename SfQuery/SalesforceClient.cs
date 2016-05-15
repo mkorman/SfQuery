@@ -25,6 +25,12 @@ namespace SfQuery
         public string AuthToken { get; set; }
         public string InstanceUrl { get; set; }
 
+        static SalesforceClient()
+        {
+            // SF requires TLS 1.1 or 1.2
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+        }
+
         // TODO: use RestSharps
         public void Login()
         {
@@ -45,7 +51,7 @@ namespace SfQuery
             }
             Console.WriteLine($"Response: {response}");
             Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
-            AuthToken = values["signature"];
+            AuthToken = values["access_token"];
             InstanceUrl = values["instance_url"];
             //Console.WriteLine($"Token: {AuthToken}");
         }
