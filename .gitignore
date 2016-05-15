@@ -1,0 +1,5 @@
+.vs/SfQuery/v14/.suo
+*.dll
+bin/
+obj/
+packages/

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace SfQuery
 {
@@ -12,14 +13,16 @@ namespace SfQuery
         {
             var client = new SalesforceClient
             {
-                Username = args[0],
-                Password = args[1],
-                Token = args[2],
-                ClientId = args[3],
-                ClientSecret = args[4]
+                Username = ConfigurationManager.AppSettings["username"],
+                Password = ConfigurationManager.AppSettings["password"],
+                Token = ConfigurationManager.AppSettings["token"],
+                ClientId = ConfigurationManager.AppSettings["clientId"],
+                ClientSecret = ConfigurationManager.AppSettings["clientSecret"]
             };
 
             client.Login();
+            Console.WriteLine(client.GetAccounts());
+            Console.ReadLine();
         }
     }
 }

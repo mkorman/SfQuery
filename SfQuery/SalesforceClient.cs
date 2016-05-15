@@ -11,23 +11,31 @@ namespace SfQuery
 {
     public class SalesforceClient
     {
-        private const String LOGIN_ENDPOINT = "https://login.salesforce.com/services/oauth2/token";
+        private const string LOGIN_ENDPOINT = "https://login.salesforce.com/services/oauth2/token";
+        private const string QUERY_ENDPOINT = "https://{0}.salesforce.com/services/data/v{1}/sobjects/{2}";
 
-        public String Username { get; set; }
-        public String Password { get; set; }
-        public String Token { get; set; }
-        public String ClientId { get; set; }
-        public String ClientSecret { get; set; }
-        public String AuthToken { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Token { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+        public string AuthToken { get; set; }
 
         public void Login()
         {
             var request = CreateLoginRequest();
             var response = getResponseText(request);
+            Console.WriteLine(response);
             Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
             AuthToken = values["signature"];
 
             Console.WriteLine($"Token: {AuthToken}");
+        }
+
+        public string GetAccounts()
+        {
+            var request = CreateQueryRequest("Account");
+            return getResponseText(request);
         }
 
         // TODO: use RestSharps
@@ -49,7 +57,18 @@ namespace SfQuery
             return request;
         }
 
-        private String getResponseText(WebRequest request)
+        private WebRequest CreateQueryRequest(string sObjectType)
+        {
+            var endpoint = string.Format(QUERY_ENDPOINT, "emea", "36.0", sObjectType);
+            var request = (HttpWebRequest)WebRequest.Create(endpoint);
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.Headers.Add("Authorisation:",$"Bearer:{AuthToken}");
+
+            return request;
+        }
+
+        private string getResponseText(WebRequest request)
         {
             using (var response = (HttpWebResponse)request.GetResponse())
             {
