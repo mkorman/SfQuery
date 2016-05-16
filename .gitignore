@@ -1,5 +1,5 @@
 .vs/SfQuery/v14/.suo
-*.dll
+App.config
 bin/
 obj/
 packages/
