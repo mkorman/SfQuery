@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
-
 namespace SfQuery
 {
     public class SalesforceClient
@@ -30,10 +29,10 @@ namespace SfQuery
         // TODO: use RestSharps
         public void Login()
         {
-            String response;
+            String jsonResponse;
             using (var client = new HttpClient())
             {
-                var content = new FormUrlEncodedContent(new Dictionary<string, string>
+                var request = new FormUrlEncodedContent(new Dictionary<string, string>
                     {
                         {"grant_type", "password"},
                         {"client_id", ClientId},
@@ -42,11 +41,12 @@ namespace SfQuery
                         {"password", Password + Token}
                     }
                 );
-                var message = client.PostAsync(LOGIN_ENDPOINT, content).Result;
-                response = message.Content.ReadAsStringAsync().Result;
+                request.Headers.Add("X-PrettyPrint", "1");
+                var response = client.PostAsync(LOGIN_ENDPOINT, request).Result;
+                jsonResponse = response.Content.ReadAsStringAsync().Result;
             }
-            Console.WriteLine($"Response: {response}");
-            var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
+            Console.WriteLine($"Response: {jsonResponse}");
+            var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonResponse);
             AuthToken = values["access_token"];
             InstanceUrl = values["instance_url"];
         }
@@ -79,12 +79,12 @@ namespace SfQuery
             }
         }
 
-        public string Query (string queryString)
+        public string Query (string soqlQuery)
         {
             using (var client = new HttpClient())
             {
-                string restQuery = InstanceUrl + API_ENDPOINT + "query/?q=" + queryString;
-                var request = new HttpRequestMessage(HttpMethod.Get, restQuery);
+                string restRequest = InstanceUrl + API_ENDPOINT + "query/?q=" + soqlQuery;
+                var request = new HttpRequestMessage(HttpMethod.Get, restRequest);
                 request.Headers.Add("Authorization", "Bearer " + AuthToken);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 request.Headers.Add("X-PrettyPrint", "1");
