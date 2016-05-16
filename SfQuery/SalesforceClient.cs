@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 
@@ -74,6 +70,20 @@ namespace SfQuery
             using (var client = new HttpClient())
             {
                 string restQuery = InstanceUrl + API_ENDPOINT + "sobjects/" + sObject;
+                var request = new HttpRequestMessage(HttpMethod.Get, restQuery);
+                request.Headers.Add("Authorization", "Bearer " + AuthToken);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                request.Headers.Add("X-PrettyPrint", "1");
+                var response = client.SendAsync(request).Result;
+                return response.Content.ReadAsStringAsync().Result;
+            }
+        }
+
+        public string Query (string queryString)
+        {
+            using (var client = new HttpClient())
+            {
+                string restQuery = InstanceUrl + API_ENDPOINT + "query/?q=" + queryString;
                 var request = new HttpRequestMessage(HttpMethod.Get, restQuery);
                 request.Headers.Add("Authorization", "Bearer " + AuthToken);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

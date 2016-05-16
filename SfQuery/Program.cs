@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
 
 namespace SfQuery
 {
     public class Program
     {
-        private static void start()
+        private static SalesforceClient CreateClient()
         {
-            var client = new SalesforceClient
+            return new SalesforceClient
             {
                 Username = ConfigurationManager.AppSettings["username"],
                 Password = ConfigurationManager.AppSettings["password"],
@@ -19,17 +15,26 @@ namespace SfQuery
                 ClientId = ConfigurationManager.AppSettings["clientId"],
                 ClientSecret = ConfigurationManager.AppSettings["clientSecret"]
             };
-
-            client.Login();
-            Console.WriteLine(client.Describe("Account"));
-            Console.WriteLine(client.Describe("Contact"));
-            Console.WriteLine(client.QueryEndpoints());
-            Console.ReadLine();
         }
 
         static void Main(string[] args)
         {
-            start();
+            var client = CreateClient();
+
+            if (args.Length > 0)
+            {
+                client.Login();
+                Console.WriteLine(client.Query(args[0]));
+            }
+            else
+            {
+                client.Login();
+                Console.WriteLine(client.Describe("Account"));
+                Console.WriteLine(client.Describe("Contact"));
+                Console.WriteLine(client.QueryEndpoints());
+                Console.WriteLine(client.Query("SELECT Name from Contact"));
+            }
+            Console.ReadLine();
         }
     }
 }
