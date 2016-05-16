@@ -15,7 +15,7 @@ namespace SfQuery
     public class SalesforceClient
     {
         private const string LOGIN_ENDPOINT = "https://login.salesforce.com/services/oauth2/token";
-        private const string QUERY_ENDPOINT = "{0}/services/data/v36.0/";
+        private const string API_ENDPOINT = "/services/data/v36.0/";
 
         public string Username { get; set; }
         public string Password { get; set; }
@@ -53,14 +53,27 @@ namespace SfQuery
             var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(response);
             AuthToken = values["access_token"];
             InstanceUrl = values["instance_url"];
-            //Console.WriteLine($"Token: {AuthToken}");
+        }
+
+        public string QueryEndpoints()
+        {
+            using (var client = new HttpClient())
+            {
+                string restQuery = InstanceUrl + API_ENDPOINT;
+                var request = new HttpRequestMessage(HttpMethod.Get, restQuery);
+                request.Headers.Add("Authorization", "Bearer " + AuthToken);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                request.Headers.Add("X-PrettyPrint", "1");
+                var response = client.SendAsync(request).Result;
+                return response.Content.ReadAsStringAsync().Result;
+            }
         }
 
         public string Describe(string sObject)
         {
             using (var client = new HttpClient())
             {
-                string restQuery = InstanceUrl + "/services/data/v33.0/sobjects/" + sObject;
+                string restQuery = InstanceUrl + API_ENDPOINT + "sobjects/" + sObject;
                 var request = new HttpRequestMessage(HttpMethod.Get, restQuery);
                 request.Headers.Add("Authorization", "Bearer " + AuthToken);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

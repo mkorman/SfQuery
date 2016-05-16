@@ -23,6 +23,7 @@ namespace SfQuery
             client.Login();
             Console.WriteLine(client.Describe("Account"));
             Console.WriteLine(client.Describe("Contact"));
+            Console.WriteLine(client.QueryEndpoints());
             Console.ReadLine();
         }
 
