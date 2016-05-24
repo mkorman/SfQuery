@@ -23,7 +23,7 @@ namespace SfQuery
         static SalesforceClient()
         {
             // SF requires TLS 1.1 or 1.2
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
         }
 
         // TODO: use RestSharps
