@@ -1,4 +1,4 @@
-SFQuery
+#SFQuery
 
-Utility tool to query the data in a Salesforce org using the REST API.
+A command-line tool to query the data in a Salesforce org using the REST API.
 
