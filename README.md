@@ -6,9 +6,10 @@
 
 SFQuery uses the Salesforce REST API to perform SOQL queries based the data in your organisation.
 
-## Installation
+## Setup
 
-You will need to configure a Connected App endpoint in your org for SFQuery to be able to log onto it.
+You will need to create a Connected App endpoint in your org for SFQuery to be able to log onto it.
 
-More information to be found [here](https://blog.mkorman.uk/integrating-net-and-salesforce-part-1-rest-api/).
+You will then need to configure your credentials (username/password/connected app ID and secret) in the App.config file. 
 
+Step-by-step information to be found [here](https://blog.mkorman.uk/integrating-net-and-salesforce-part-1-rest-api/).
