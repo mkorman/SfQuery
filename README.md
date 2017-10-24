@@ -2,11 +2,11 @@
 
 .Net-based command-line utility to query Salesforce data.
 
-##Introduction
+## Introduction
 
 SFQuery uses the Salesforce REST API to perform SOQL queries based the data in your organisation.
 
-##Installation
+## Installation
 
 You will need to configure a Connected App endpoint in your org for SFQuery to be able to log onto it.
 
