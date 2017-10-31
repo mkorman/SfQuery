@@ -2,6 +2,8 @@
 
 .Net-based command-line utility to query Salesforce data.
 
+This is mostly a proof of concept on how to integrate with Salesforce's REST API, but it still can be used to query data in the org.
+
 ## Introduction
 
 SFQuery uses the Salesforce REST API to perform SOQL queries based the data in your organisation.
