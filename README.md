@@ -13,3 +13,16 @@ You will need to create a Connected App endpoint in your org for SFQuery to be a
 You will then need to configure your credentials (username/password/connected app ID and secret) in the App.config file. 
 
 Step-by-step information to be found [here](https://blog.mkorman.uk/integrating-net-and-salesforce-part-1-rest-api/).
+
+## Usage
+
+
+### Querying the data in your org
+
+To run a query:
+
+`SfQuery <query>`
+
+For instance:
+
+`SfQuery "Select ID, Name from Contact"`
